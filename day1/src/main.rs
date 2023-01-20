@@ -1,3 +1,5 @@
+use std::cmp::Reverse;
+
 use color_eyre::eyre::Context;
 use color_print::cprintln;
 use itertools::Itertools;
@@ -22,13 +24,7 @@ fn part1_itertools(input: &str) {
     let max_lead = input
         .lines()
         .map(|line| line.parse::<u32>().ok())
-        .batching(|it| {
-            let mut sum = None;
-            while let Some(Some(v)) = it.next() {
-                sum = Some(sum.unwrap_or(0) + v);
-            }
-            sum
-        })
+        .batching(|it| it.map_while(|x| x).sum1::<u32>())
         .max()
         .unwrap_or_default();
     cprintln!("Elven lead: <green>{}</green>", max_lead);
@@ -39,14 +35,8 @@ fn part2(input: &str) {
     let top3 = input
         .lines()
         .map(|line| line.parse::<u32>().ok())
-        .batching(|it| {
-            let mut sum = None;
-            while let Some(Some(v)) = it.next() {
-                sum = Some(sum.unwrap_or(0) + v);
-            }
-            sum
-        })
-        .sorted_by_key(|&v| std::cmp::Reverse(v))
+        .batching(|it| it.map_while(|x| x).sum1::<u32>())
+        .sorted_by_key(|&v| Reverse(v))
         .take(3)
         .sum::<u32>();
     cprintln!("Top 3 elven groups: <green>{}</green>", top3);
